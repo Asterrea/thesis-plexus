@@ -29,7 +29,7 @@ def index(request):
                   {
                         #'layers' : layers,
                         #'stops'  : stops,
-                        'routes' : geojson
+                        'routes' : jsonpickle.encode(geojson)
                   })
 
 def new(request):

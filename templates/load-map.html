@@ -1,10 +1,231 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load leaflet_tags %}
+{% load staticfiles  %}
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Plexus Map</title>
+
+    {% leaflet_js %}
+    {% leaflet_css %}
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/leaflet-search.css' %}">
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.css"/>
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/MarkerCluster.Default.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.0/leaflet.draw.css"/>
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.css">
+
+    <script src="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.0/leaflet.draw.js"></script>
+    <script type="text/javascript" src="{% static "js/map.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/main.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/leaflet-search.js" %}"></script>
+
 </head>
+
 <body>
-$END$
+    <div id="header">
+        <!--<form action="" method="post" id="save-form">-->
+           <!-- {% csrf_token %}
+            <input type="hidden" id="allLayers" value={{ layers }}>-->
+            <ul>
+                <li>
+                    <label class="switch">
+                      <input id="plexus-mode" type="checkbox" autocomplete="off">
+                      <div class="slider round"></div>
+                    </label>
+                </li>
+                <li class="pull-right">
+                    <button id="export" class="nav-btn btn">Export</button>
+                </li>
+                <li class="pull-right">
+                    <button id="edit-save" class="nav-btn btn hidden">Save</button>
+                </li>
+            </ul>
+       <!-- </form>-->
+    </div>
+
+    <script  type="text/javascript">
+
+        function mapInit(map) {
+            var routeList = {{routes|safe}};
+            leafletInit(map, routeList)
+        }
+    </script>
+
+    {% leaflet_map "mapdiv" callback="mapInit" %}
+
+ <!--   <div id="layerview">
+            <h3>Map Layers</h3>
+            {%  if layers %}
+                <ul>
+                    {% for layer in layers %}
+                        <li>
+                            {{ layer.documentLayer.filename }}
+                            <input type="hidden" id= "geojsonPath" value={{ layer.documentLayer.getFullPath }}/>
+                            <button id="settings"> x </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No file/s uploaded</p>
+            {% endif %}
+            <button id="layerbtn" class="btn btn"> Add Data Layers </button>
+    </div>
+    -->
+
+    <!-- MODALS -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+              <span class="close">×</span>
+              <h3>Route Information</h3>
+            </div>
+            <div class="modal-body">
+               <label for="route_id">Route Id:</label>
+               <input type="text" id="route_id" autocomplete="off">
+               <label for="route_name">Route Name:</label>
+               <input type="text" id="route_name" name="route_name" autocomplete="off">
+               <label for="route_color">Color:</label>
+               <input style="margin-bottom:10px; margin-top:10px;" type="color" id="route_color">
+            </div>
+            <div class="modal-footer">
+              <button id="modal-create" style="margin-top:10px;" class="btn pull-right">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="saveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+              <span class="close">×</span>
+              <h3>Save Options</h3>
+            </div>
+            <div class="modal-body">
+               <label for="prototypename">Prototype Name:</label>
+               <input type="text" id="prototypename" autocomplete="off">
+               <label for="name">By:</label>
+               <input type="text" id="name" name="name" autocomplete="off">
+               <label for="date">On:</label>
+               <input type="date" id="date" name="date" value="" >
+            </div>
+            <div class="modal-footer">
+              <button id="modal-save" style="margin-top:10px;" class="btn pull-right">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">x</span>
+                <h3>Export Options</h3>
+            </div>
+        <div class="modal-body">
+            <label for="exportFilename">Export As:</label>
+            <input type="text" id="exportFilename" autocomplete="off">
+            <div>
+                <a href="#" id="exportGeojson"  class="btn download">GeoJson</a>
+                <a href="#" id="exportCsv" class="btn download">CSV</a>
+                <a href="#" id="exportGtfs" class="btn download">(test)</a>
+            </div>
+        </div>
+        <div class="modal-footer"></div>
+        </div>
+    </div>
+
+<script type ="text/javascript">
+
+            $("#plexus-mode").on("click", function(){
+               if(document.getElementById('plexus-mode').checked){
+                   $("#edit-save").removeClass("hidden");
+
+                   alert("Edit Mode");
+               }else{
+                   $("#edit-save").addClass("hidden");
+                   alert("View Mode");
+               }
+            });
+
+            $("#layerbtn").click(function(){
+                $.ajax({
+                    type: 'GET',
+                    success: function(){
+                        window.location = "/plexus/upload-data/";
+                    }
+                });
+            });
+
+            $("#edit-save").on("click", function(){
+                $.ajax({
+                    url: "/plexus/load-map/save/",
+                    type: 'POST',
+                    success: function(){
+                        alert("Saved!");
+                        window.location.reload()
+                    }
+                 });
+            });
+
+            function openCreateModal(){
+                var modal = document.getElementById('createModal');
+                var span = document.getElementsByClassName("close")[0];
+
+                $("#modal-create").on("click", function(){
+                    modal.style.display="none";
+                });
+
+                modal.style.display = "block";
+                span.onclick = function() {
+                    modal.style.display = "none";
+                };
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                };
+            }
+
+            $("#prototype-save").on("click", function () {
+                document.getElementById("date").setAttribute("value", new Date());
+                var modal = document.getElementById('saveModal');
+                var span = document.getElementsByClassName("close")[1];
+
+                modal.style.display = "block";
+                span.onclick = function() {
+                    modal.style.display = "none";
+                };
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                };
+            });
+
+            $("#export").on("click", function(){
+                var modal = document.getElementById('exportModal');
+                var span = document.getElementsByClassName("close")[2];
+
+                modal.style.display = "block";
+                span.onclick = function() {
+                    modal.style.display = "none";
+                };
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                };
+            });
+
+            $("#exportFilename").on("click", function () {
+                var data = editableRoutes.toGeoJSON();
+                var convertedData = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+                var filename = document.getElementById("exportFilename").value;
+
+                this.setAttribute('href', 'data:' + convertedData);
+                this.setAttribute('download', filename);
+            });
+
+</script>
 </body>
-</html>

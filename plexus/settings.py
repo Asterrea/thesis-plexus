@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import mongoengine
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -39,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gridlock',
+    'leaflet',
+    'djgeojson',
+    'jsonpickle',
+
 ]
 
 MIDDLEWARE = [
@@ -73,15 +78,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'plexus.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+_MONGODB_USER = 'heroku_6xczzm76'
+_MONGODB_PASSWD = 'e1vudrg3h1l742k75lln200j8e'
+_MONGODB_HOST = 'ds161255.mlab.com'
+_MONGODB_PORT = '61255'
+_MONGODB_NAME = 'heroku_6xczzm76'
+_MONGODB_DATABASE_HOST = \
+  'mongodb://%s:%s@%s:%s/%s' \
+  % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_PORT,_MONGODB_NAME)
+
+mongoengine.connect(_MONGODB_NAME, host=_MONGODB_DATABASE_HOST)
+
+AUTHENTICATION_BACKENDS = (
+    'mongoengine.django.auth.MongoEngineBackend',
+)
 
 
 # Password validation
@@ -130,3 +141,12 @@ STATICFILES_DIRS = (
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+
+# Leaflet configuration
+LEAFLET_CONFIG = {
+'DEFAULT_CENTER': (14.5995, 120.9842),
+'DEFAULT_ZOOM': 12,
+'MIN_ZOOM': 1,
+'MAX_ZOOM': 20
+}

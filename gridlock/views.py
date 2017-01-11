@@ -58,29 +58,24 @@ def update(request):
         line = json.loads(request.body)
 
         _id = line['_id']
-        print("Object Id: %s" % (_id.get('$oid')))
+        print(_id)
+
         route_id = line['route_id']
-        print("ROUTE_ID: %s" % (route_id))
         geometry = line['geometry']
-        print("GEOMETRIES: %s" % (geometry))
         properties = line['properties']
 
         try:
             Route.objects(id=ObjectId(_id.get('$oid'))).update(set__geometry=geometry, set__properties=properties)
-            print("Edited: " + route_id)
-
             return HttpResponse("Success!")
+
         except:
-            print("Unedited.")
             return HttpResponse("Error!")
 
     elif request.method == "GET":
-
         _id = request.GET.get('id','')
-        print("Finding object id: %s" %(_id))
+        print(_id)
         route = Route.objects.get(id=ObjectId(_id))
         route = route.to_json()
-
         return HttpResponse(dumps(route))
 
 
@@ -91,11 +86,9 @@ def delete(request):
 
     try:
         Route.objects(id=ObjectId(_id.get('$oid'))).delete()
-        print("Deleted!")
-        #update geojson file to load
         return HttpResponse("Success!")
+
     except:
-        print("Delete unsuccessful.")
         return HttpResponse("Error!")
 
 def export(request):

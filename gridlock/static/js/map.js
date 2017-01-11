@@ -39,17 +39,8 @@
             });*/
 
             //routes
-            var selectedFeature = null;
-            var highlight = {
-                //randomColor = '#' + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6);
-                'color': '#149c14',
-                'weight': 4,
-                'opacity': 1
-            };
-
-
             console.log(routeList[0]);
-            displayRoutes(routeList, routes);
+            displayRoutes(map, routeList, routes);
 
 
             var animatedToggle = L.easyButton({
@@ -92,7 +83,7 @@
                        props.route_color = document.getElementById("route_color").value;
                        var toGeojson = layer.toGeoJSON();
                        $.ajax({
-                          url: "/plexus/load-map/new/route/",
+                          url: "/gridlock/load-map/new/route/",
                           data: JSON.stringify(toGeojson),
                           dataType: 'json',
                           type: 'POST',
@@ -164,7 +155,14 @@
             map.addControl(searchControl);
 }
 
-    function displayRoutes(data, routes){
+    function displayRoutes(map, data, routes){
+                var selectedFeature = null;
+                var highlight = {
+                    //randomColor = '#' + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6);
+                    'color': '#149c14',
+                    'weight': 4,
+                    'opacity': 1
+                };
                 var btnCount= 0;
                 var routeLayer = L.geoJson(data,{
                     onEachFeature: function(feature,layer){
@@ -194,9 +192,9 @@
                                             onClick: function(btn){
                                                 var editedFeature = selectedFeature.toGeoJSON();
                                                 var id = editedFeature._id['$oid'];
-
+                                                console.log(id);
                                                 $.ajax({
-                                                    url: "/plexus/load-map/update/",
+                                                    url: "/gridlock/load-map/update/",
                                                     type: 'GET',
                                                     data:{
                                                         id:id
@@ -222,7 +220,7 @@
                                                             props.route_color = document.getElementById("route_color").value;
                                                             var toGeojson = layer.toGeoJSON();
                                                            $.ajax({
-                                                              url: "/plexus/load-map/update",
+                                                              url: "/gridlock/load-map/update",
                                                               data: JSON.stringify(toGeojson),
                                                               dataType: 'json',
                                                               type: 'POST',
@@ -246,7 +244,7 @@
                                                 var editedFeature = selectedFeature.toGeoJSON();
                                                 alert("Updating:" + editedFeature.route_id);
                                                 $.ajax({
-                                                    url: "/plexus/load-map/update/",
+                                                    url: "/gridlock/load-map/update/",
                                                     data: JSON.stringify(editedFeature),
                                                     dataType: 'json',
                                                     type: 'POST',
@@ -272,7 +270,7 @@
                                                 alert("Deleting...");
 
                                                 $.ajax({
-                                                    url: "/plexus/load-map/delete/",
+                                                    url: "/gridlock/load-map/delete/",
                                                     data: JSON.stringify(editedFeature),
                                                     dataType: 'json',
                                                     type: 'POST',

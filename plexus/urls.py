@@ -23,7 +23,7 @@ from django.views.generic import RedirectView
 urlpatterns = [
 url(r'^gridlock/', include('gridlock.urls')),
 url(r'^admin/', admin.site.urls),
-url(r'^$', RedirectView.as_view(url='/gridlock/upload-data/', permanent = True)),
+url(r'^$', RedirectView.as_view(url='/gridlock/load-map/', permanent = True)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += staticfiles_urlpatterns()

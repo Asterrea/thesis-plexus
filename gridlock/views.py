@@ -1,16 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .storage import getGeoJson
-
 from models import Route
-import json, ast
 from bson.objectid import ObjectId
 from bson.json_util import dumps
-
-
 import plexus.settings as settings
 import jsonpickle
-
+import json
 
 #Return requested Json file
 def getSingleJsonFile(request):
@@ -18,16 +14,13 @@ def getSingleJsonFile(request):
     jsonFile = getGeoJson(request,filename)
     return HttpResponse(jsonFile, content_type="application/json")
 
-#DisplayMap : Load all layers,
-#stops, routes
+#DisplayMap : stops, routes
 def index(request):
     features = [r._data for r in Route.objects.all()]
     geojson = {'type': 'FeatureCollection', 'features': features}
 
-
     return render(request, settings.TEMPLATES[0]['DIRS'][0] + '/load-map.html',
                   {
-                        #'layers' : layers,
                         #'stops'  : stops,
                         'routes' : jsonpickle.encode(geojson)
                   })
@@ -55,17 +48,25 @@ def new(request):
 def update(request):
 
     if request.method == "POST":
-        line = json.loads(request.body)
 
-        _id = line['_id']
+        _id = request.POST.get('_id',ObjectId())
         print(_id)
+        route_id = request.POST.get('route_id','')
+        geometry = request.POST.get('geometry', '')
+        properties = request.POST.get('properties','')
+        print (properties)
+        print (str(properties))
 
-        route_id = line['route_id']
-        geometry = line['geometry']
-        properties = line['properties']
+        #r = Route.objects.get(route_id='LTFRB_PUJ2616')
+        #print (r["id"],r["properties"])
+
+        test = Route.objects.get(id = ObjectId('587c4c3b203ada19e8e0ecf6'))
+        print (test["id"], test["properties"])
 
         try:
-            Route.objects(id=ObjectId(_id.get('$oid'))).update(set__geometry=geometry, set__properties=properties)
+            route_test = Route.objects.get(id=_id)
+            print(route_test)
+            Route.objects.get(id=_id).update(set__geometry=geometry, set__properties=properties)
             return HttpResponse("Success!")
 
         except:

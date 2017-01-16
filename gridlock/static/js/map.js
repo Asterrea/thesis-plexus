@@ -191,13 +191,11 @@
                                             icon: "fa fa-pencil-square-o",
                                             onClick: function(btn){
                                                 var editedFeature = selectedFeature.toGeoJSON();
-                                                var id = editedFeature._id['$oid'];
-                                                console.log(id);
                                                 $.ajax({
                                                     url: "/gridlock/load-map/update/",
                                                     type: 'GET',
                                                     data:{
-                                                        id:id
+                                                        id:editedFeature.id
                                                     },
                                                     success: function(data){
                                                         openCreateModal();
@@ -221,10 +219,15 @@
                                                             var toGeojson = layer.toGeoJSON();
                                                            $.ajax({
                                                               url: "/gridlock/load-map/update",
-                                                              data: JSON.stringify(toGeojson),
-                                                              dataType: 'json',
-                                                              type: 'POST',
-                                                              contentType: "application/json;charset=utf-8"
+                                                              data: {
+                                                                  id:editedFeature.id,
+                                                                  geometry: JSON.stringify(editedFeature.geometry),
+                                                                  properties: JSON.stringify(editedFeature.properties)
+
+                                                              }, //JSON.stringify(toGeojson)
+                                                              //dataType: 'json',
+                                                              type: 'POST'
+                                                              //contentType: "application/json;charset=utf-8"
                                                             });
                                                         });
                                                     }
@@ -243,12 +246,18 @@
                                                 layer.closePopup();
                                                 var editedFeature = selectedFeature.toGeoJSON();
                                                 alert("Updating:" + editedFeature.route_id);
+
                                                 $.ajax({
                                                     url: "/gridlock/load-map/update/",
-                                                    data: JSON.stringify(editedFeature),
-                                                    dataType: 'json',
-                                                    type: 'POST',
-                                                    contentType: "application/json;charset=utf-8"
+                                                    data: {
+                                                        id:editedFeature.id,
+                                                        route_id: JSON.stringify(editedFeature.route_id),
+                                                        geometry: JSON.stringify(editedFeature.geometry),
+                                                        properties: JSON.stringify(editedFeature.properties)
+                                                    }, //JSON.stringify(editedFeature),
+                                                   // dataType: 'json',
+                                                    type: 'POST'
+                                                   // contentType: "application/json;charset=utf-8"
                                                 });
                                                 btnCount-=1;
                                                 this.removeFrom(map);

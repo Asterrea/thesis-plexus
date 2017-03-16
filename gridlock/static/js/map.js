@@ -79,7 +79,7 @@
 
                        feature.type = "Feature";
                        feature.route_id = document.getElementById("route_id").value;
-                       props.route_name = document.getElementById("route_name").value;
+                       props.route_desc = document.getElementById("route_desc").value;
                        props.route_color = document.getElementById("route_color").value;
                        var toGeojson = layer.toGeoJSON();
                        $.ajax({
@@ -133,7 +133,7 @@
             var searchControl = new L.Control.Search({
                 layer: routes,
                 position : 'topleft',
-                propertyName: 'route_name',
+                propertyName: 'route_desc',
                 marker:false,
                 moveToLocation: function(latlng, title, map) {
                 var zoom = map.getBoundsZoom(latlng.layer.getBounds());
@@ -205,7 +205,7 @@
                                                         obj = jQuery.parseJSON(jsonobj);
 
                                                         document.getElementById("route_id").value = obj.route_id;
-                                                        document.getElementById("route_name").value = obj.properties.route_name;
+                                                        document.getElementById("route_desc").value = obj.properties.route_desc;
                                                         if(typeof obj.properties.route_color !== "undefined")
                                                             document.getElementById("route_color").value = obj.properties.route_color;
                                                         else{
@@ -214,7 +214,7 @@
                                                         $("#modal-create").on('click', function(){
                                                             feature.type = "Feature";
                                                             feature.route_id = document.getElementById("route_id").value;
-                                                            props.route_name = document.getElementById("route_name").value;
+                                                            props.route_desc = document.getElementById("route_desc").value;
                                                             props.route_color = document.getElementById("route_color").value;
                                                             var toGeojson = layer.toGeoJSON();
                                                            $.ajax({
@@ -303,7 +303,7 @@
                                 }
                             }
                         });
-                        layer.bindPopup(feature.properties.route_name);
+                        layer.bindPopup(feature.properties.route_desc);
                     }
                 });
                 routes.addLayer(routeLayer);
